@@ -1,0 +1,69 @@
+% Our usual unary representation of natural numbers.
+nat : type.
+z : nat.
+s : nat -> nat.
+
+% plus a b c represents the truth value "a + b = c"
+plus : nat -> nat -> nat -> type.
+% "0 + N = N"
+plus/z : plus z N N.   
+% "N + M = P" => "(1 + N) + M = (1 + P)" 
+plus/s : plus N M P -> plus (s N) M (s P). 
+
+%worlds () (plus _ _ _).
+%unique plus +N1 +N2 -1N3.
+
+
+% We can now prove our usual lemmas for the proof of commutativity of addition.
+
+% "N1 + 0 = N1"
+plus-zero-id :  {N1 : nat} plus N1 z N1 -> type.
+%mode plus-zero-id +N -D.
+
+pzidz : plus-zero-id
+         z
+         plus/z.
+
+pzids : plus-zero-id
+         (s N)
+         (plus/s D : plus (s N) z (s N))
+          <- plus-zero-id N D.
+
+%worlds () (plus-zero-id _ _).
+%total N (plus-zero-id N _).
+
+
+% "N1 + N2 = N3" => "N1 + (1 + N2) = (1 + N3)"
+plus-succ : plus N1 N2 N3 -> plus N1 (s N2) (s N3) -> type.
+%mode plus-succ +D1 -D2.
+
+pfz : plus-succ 
+       _
+       plus/z.
+
+pfs : plus-succ
+       (plus/s Dplus : plus (s N1) N2 (s N3))
+       (plus/s DIH   : plus (s N1) (s N2) (s (s N3)))
+         <- plus-succ Dplus DIH.
+
+%worlds () (plus-succ _ _).
+%total D (plus-succ D _).
+ 
+
+% "N1 + N2 = N3" => "N2 + N1 = N3"
+plus-comm : plus N1 N2 N3 -> plus N2 N1 N3 -> type.
+%mode plus-comm +D1 -D2.
+
+pcz : plus-comm
+       _
+       D
+        <- plus-zero-id N1 D.
+       
+pcs : plus-comm       
+       (plus/s Dplus: plus (s N1') N2 (s N3'))
+       D
+        <- plus-comm Dplus DIH
+        <- plus-succ DIH D.
+
+%worlds () (plus-comm _ _).
+%total D (plus-comm D _).

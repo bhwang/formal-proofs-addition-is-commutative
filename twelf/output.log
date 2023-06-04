@@ -1,0 +1,45 @@
+Twelf 1.7.1 (built 03/19/11 at 08:23:24 on concordia.westell.com)
+%% OK %%
+make
+[Opening file sources.cfg]
+[Closing file sources.cfg]
+[Opening file plus-comm.elf]
+nat : type.
+z : nat.
+s : nat -> nat.
+plus : nat -> nat -> nat -> type.
+plus/z : {N:nat} plus z N N.
+plus/s : {N:nat} {M:nat} {P:nat} plus N M P -> plus (s N) M (s P).
+%worlds () (plus _ _ _).
+%unique +{N1:nat} +{N2:nat} -1{N3:nat} (plus N1 N2 N3).
+plus-zero-id : {N1:nat} plus N1 z N1 -> type.
+%mode +{N:nat} -{D:plus N z N} (plus-zero-id N D).
+pzidz : plus-zero-id z plus/z.
+pzids :
+   {N:nat} {D:plus N z N} plus-zero-id N D -> plus-zero-id (s N) (plus/s D).
+%worlds () (plus-zero-id _ _).
+%total N (plus-zero-id N _).
+plus-succ :
+   {N1:nat} {N2:nat} {N3:nat} plus N1 N2 N3 -> plus N1 (s N2) (s N3) -> type.
+%mode +{N1:nat} +{N2:nat} +{N3:nat} +{D1:plus N1 N2 N3} -{D2:plus N1 (s N2) (s N3)}
+   (plus-succ D1 D2).
+pfz : {X1:nat} {X2:plus z X1 X1} plus-succ X2 plus/z.
+pfs :
+   {N1:nat} {N2:nat} {N3:nat} {Dplus:plus N1 N2 N3} {DIH:plus N1 (s N2) (s N3)}
+      plus-succ Dplus DIH -> plus-succ (plus/s Dplus) (plus/s DIH).
+%worlds () (plus-succ _ _).
+%total D (plus-succ D _).
+plus-comm : {N1:nat} {N2:nat} {N3:nat} plus N1 N2 N3 -> plus N2 N1 N3 -> type.
+%mode +{N1:nat} +{N2:nat} +{N3:nat} +{D1:plus N1 N2 N3} -{D2:plus N2 N1 N3}
+   (plus-comm D1 D2).
+pcz :
+   {N1:nat} {D:plus N1 z N1} {X1:plus z N1 N1}
+      plus-zero-id N1 D -> plus-comm X1 D.
+pcs :
+   {N2:nat} {N1':nat} {N3':nat} {DIH:plus N2 N1' N3'}
+      {D:plus N2 (s N1') (s N3')} {Dplus:plus N1' N2 N3'}
+      plus-succ DIH D -> plus-comm Dplus DIH -> plus-comm (plus/s Dplus) D.
+%worlds () (plus-comm _ _).
+%total D (plus-comm D _).
+[Closing file plus-comm.elf]
+%% OK %%
